@@ -7,6 +7,20 @@
 #include "Tile.h"
 #include "Grid.generated.h"
 
+UENUM(BlueprintType)
+namespace EFallDirection
+{
+	// from which direction start falling?
+	enum Type
+	{
+		EFD_Top,
+		EFD_Right,
+		EFD_Bottom,
+		EFD_Left
+	};
+}
+
+
 USTRUCT(BlueprintType)
 struct FTileType
 {
