@@ -115,7 +115,8 @@ void ATile::StartFalling(bool bUseCurrentWorldLocation)
 		while (true)
 		{
 			++YOffset;
-			if (Grid->GetGridAddressWithOffset(GetGridAddress(), 0, -YOffset, LandingGridAddress))
+			//if (Grid->GetGridAddressWithOffset(GetGridAddress(), 0, -YOffset, LandingGridAddress))
+			if (Grid->GetGridAddressWithOffset(GetGridAddress(), -YOffset, 0, LandingGridAddress))
 			{
 				if (ATile* TileBelow = Grid->GetTileFromGridAddress(LandingGridAddress))
 				{
@@ -140,19 +141,26 @@ void ATile::StartFalling(bool bUseCurrentWorldLocation)
 			}
 			// This space is off the grid or contains a tile that is staying. Go back one space and stop.
 			YOffset -= HeightAboveBottom;
-			Grid->GetGridAddressWithOffset(GetGridAddress(), 0, -YOffset, LandingGridAddress);
+			//Grid->GetGridAddressWithOffset(GetGridAddress(), 0, -YOffset, LandingGridAddress);
+			Grid->GetGridAddressWithOffset(GetGridAddress(), -YOffset, 0, LandingGridAddress);
 			break;
 		}
-		FallDistance = Grid->TileSize.Y * YOffset;
+		/*FallDistance = Grid->TileSize.Y * YOffset;
 		FallingEndLocation = FallingStartLocation;
-		FallingEndLocation.Z -= FallDistance;
+		FallingEndLocation.Z -= FallDistance;*/
+
+		FallDistance = Grid->TileSize.X * YOffset;
+		FallingEndLocation = FallingStartLocation;
+		FallingEndLocation.X -= FallDistance;
 	}
 	else
 	{
 		// Fall from where we are physically to where we are supposed to be on the grid.
 		LandingGridAddress = GetGridAddress();
 		FallingEndLocation = Grid->GetLocationFromGridAddress(LandingGridAddress);
-		FallDistance = FallingStartLocation.Z - FallingEndLocation.Z;
+		//FallDistance = FallingStartLocation.Z - FallingEndLocation.Z;
+		// try falling from Left
+		FallDistance = FallingStartLocation.X - FallingEndLocation.X;
 	}
 	AMatch3GameMode* CurrentGameMode = Cast<AMatch3GameMode>(UGameplayStatics::GetGameMode(this));
 	TotalFallingTime = 0.0f;

@@ -244,23 +244,54 @@ void AGrid::OnTileFinishedMatching(ATile* InTile)
 
 void AGrid::RespawnTiles()
 {
-	for (int32 x = 0; x < GridWidth; ++x)
+	//for (int32 x = 0; x < GridWidth; ++x)
+	//{
+	//	// Replace all null tiles, starting from the top of the column. Stop when we hit a non-null tile.
+	//	int32 BaseAddress, TestAddress;
+	//	if (GetGridAddressWithOffset(0, x, GridHeight - 1, BaseAddress))
+	//	{
+	//		int32 y_depth;
+	//		for (y_depth = 0; GetGridAddressWithOffset(BaseAddress, 0, -y_depth, TestAddress) && (!GetTileFromGridAddress(TestAddress)); ++y_depth)
+	//		{
+	//			// This loop finds the lowest Y value, but does nothing with it.
+	//		}
+	//		for (int32 y = y_depth - 1; y >= 0; --y)
+	//		{
+	//			int32 NewTileTypeID = SelectTileFromLibrary();
+	//			GetGridAddressWithOffset(BaseAddress, 0, -y, TestAddress);
+	//			// Move our tile up visually so it has room to fall, but don't change its grid address. The new grid address would be off-grid and invalid anyway.
+	//			if (ATile* NewTile = CreateTile(TileLibrary[NewTileTypeID].TileClass, TileLibrary[NewTileTypeID].TileMaterial, GetLocationFromGridAddressWithOffset(TestAddress, 0, (y_depth + 1)), TestAddress, NewTileTypeID))
+	//			{
+	//				TilesToCheck.Add(NewTile);
+	//				NewTile->TileState = ETileState::ETS_Falling;
+	//				check(!FallingTiles.Contains(NewTile));
+	//				FallingTiles.Add(NewTile);
+	//			}
+	//		}
+	//	}
+	//	else
+	//	{
+	//		check(false);
+	//	}
+	//}
+
+	for (int32 x = 0; x < GridHeight; ++x)
 	{
 		// Replace all null tiles, starting from the top of the column. Stop when we hit a non-null tile.
 		int32 BaseAddress, TestAddress;
-		if (GetGridAddressWithOffset(0, x, GridHeight - 1, BaseAddress))
+		if (GetGridAddressWithOffset(0, GridWidth - 1, x, BaseAddress))
 		{
 			int32 y_depth;
-			for (y_depth = 0; GetGridAddressWithOffset(BaseAddress, 0, -y_depth, TestAddress) && (!GetTileFromGridAddress(TestAddress)); ++y_depth)
+			for (y_depth = 0; GetGridAddressWithOffset(BaseAddress, -y_depth, 0, TestAddress) && (!GetTileFromGridAddress(TestAddress)); ++y_depth)
 			{
 				// This loop finds the lowest Y value, but does nothing with it.
 			}
 			for (int32 y = y_depth - 1; y >= 0; --y)
 			{
 				int32 NewTileTypeID = SelectTileFromLibrary();
-				GetGridAddressWithOffset(BaseAddress, 0, -y, TestAddress);
+				GetGridAddressWithOffset(BaseAddress, -y, 0, TestAddress);
 				// Move our tile up visually so it has room to fall, but don't change its grid address. The new grid address would be off-grid and invalid anyway.
-				if (ATile* NewTile = CreateTile(TileLibrary[NewTileTypeID].TileClass, TileLibrary[NewTileTypeID].TileMaterial, GetLocationFromGridAddressWithOffset(TestAddress, 0, (y_depth + 1)), TestAddress, NewTileTypeID))
+				if (ATile* NewTile = CreateTile(TileLibrary[NewTileTypeID].TileClass, TileLibrary[NewTileTypeID].TileMaterial, GetLocationFromGridAddressWithOffset(TestAddress, (y_depth + 1), 0), TestAddress, NewTileTypeID))
 				{
 					TilesToCheck.Add(NewTile);
 					NewTile->TileState = ETileState::ETS_Falling;
@@ -458,9 +489,29 @@ void AGrid::ExecuteMatch(const TArray<ATile*>& MatchingTiles)
 		// Tell all tiles above any tile we're about to destroy that they need to fall. Up on the screen is negative Y on the grid.
 		int32 NextAddressUp;
 		ATile* NextTileUp;
-		for (int32 YOffset = 1; YOffset < GridHeight; ++YOffset)
+
+		//for (int32 YOffset = 1; YOffset < GridHeight; ++YOffset)
+		//{
+		//	if (GetGridAddressWithOffset(Tile->GetGridAddress(), 0, YOffset, NextAddressUp))
+		//	{
+		//		NextTileUp = GetTileFromGridAddress(NextAddressUp);
+		//		// If the tile above us is invalid or is being destroyed, stop adding to the list.
+		//		if (NextTileUp && !MatchingTiles.Contains(NextTileUp))
+		//		{
+		//			// Set the tile to falling state as soon as it is added to the list.
+		//			NextTileUp->TileState = ETileState::ETS_Falling;
+		//			check(!FallingTiles.Contains(NextTileUp));
+		//			FallingTiles.Add(NextTileUp);
+		//			continue;
+		//		}
+		//		break;
+		//	}
+		//}
+		
+		// try falling from Left, Get FallingTiles
+		for (int32 XOffset = 1; XOffset < GridWidth; ++XOffset)
 		{
-			if (GetGridAddressWithOffset(Tile->GetGridAddress(), 0, YOffset, NextAddressUp))
+			if (GetGridAddressWithOffset(Tile->GetGridAddress(), XOffset, 0, NextAddressUp))
 			{
 				NextTileUp = GetTileFromGridAddress(NextAddressUp);
 				// If the tile above us is invalid or is being destroyed, stop adding to the list.
@@ -475,6 +526,7 @@ void AGrid::ExecuteMatch(const TArray<ATile*>& MatchingTiles)
 				break;
 			}
 		}
+
 		Tile->TileState = ETileState::ETS_PendingDelete;
 	}
 
