@@ -14,6 +14,7 @@ AGrid::AGrid(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitiali
 
 	MinimumRunLength = 3;
 	TileSize.Set(25.0f, 25.0f);
+	FallDirection = EFallDirection::EFD_Top;
 }
 
 void AGrid::InitGrid()

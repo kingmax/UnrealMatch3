@@ -7,16 +7,20 @@
 #include "Tile.h"
 #include "Grid.generated.h"
 
+
+// from which direction start falling? ref: https://unreal.gg-labs.com/wiki-archives/macros-and-data-types/enums-for-both-c++-and-bp
 UENUM(BlueprintType)
 namespace EFallDirection
 {
-	// from which direction start falling?
+	//enum class EFallDirectionType : uint8
 	enum Type
 	{
-		EFD_Top,
-		EFD_Right,
-		EFD_Bottom,
-		EFD_Left
+		EFD_Top			UMETA(DisplayName="Top"),
+		EFD_Right		UMETA(DisplayName = "Right"),
+		EFD_Bottom		UMETA(DisplayName = "Bottom"),
+		EFD_Left		UMETA(DisplayName = "Left"),
+		EFD_Center		UMETA(DisplayName = "Center"), // from outer to center
+		EFD_Random		UMETA(DisplayName = "Random"),	// from random of top,right,bottom,left
 	};
 }
 
@@ -72,6 +76,9 @@ public:
 	/** The height of the grid. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Tile)
 	int32 GridHeight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Tile)
+	TEnumAsByte<EFallDirection::Type> FallDirection;
 
 	/** Spawn a tile and associate it with a specific grid address. */
 	ATile* CreateTile(TSubclassOf<class ATile> TileToSpawn, class UMaterialInstanceConstant* TileMaterial, FVector SpawnLocation, int32 SpawnGridAddress, int32 TileTypeID);
