@@ -116,6 +116,7 @@ void ATile::StartFalling(bool bUseCurrentWorldLocation)
 		{
 			++YOffset;
 			//if (Grid->GetGridAddressWithOffset(GetGridAddress(), 0, -YOffset, LandingGridAddress))
+			// YOffset实际上现在是XOffset, 用于Falling From X Direction
 			if (Grid->GetGridAddressWithOffset(GetGridAddress(), -YOffset, 0, LandingGridAddress))
 			{
 				if (ATile* TileBelow = Grid->GetTileFromGridAddress(LandingGridAddress))
